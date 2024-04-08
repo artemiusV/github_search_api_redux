@@ -4,6 +4,7 @@ import "./Home.css";
 import { User } from "../../ui/User";
 import { fetchUsers } from "../../../api";
 import { UsersProps } from "../../../types";
+import useDebouncedEffect from "../../../useDebounce";
 
 type HomeProps = {};
 
@@ -30,16 +31,16 @@ export const Home: FC<HomeProps> = () => {
     setLimit(parseInt(value));
   };
 
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(async () => {
+  useDebouncedEffect(
+    async () => {
       if (searchQuery) {
         const items = await fetchUsers(searchQuery, page, limit);
         setUsers(items);
       }
-    }, 500);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery, page, limit]);
+    },
+    500,
+    [searchQuery, page, limit]
+  );
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setSearchQuery(data.query);
