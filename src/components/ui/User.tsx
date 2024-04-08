@@ -1,15 +1,8 @@
-import React from "react";
+import React, { FC } from "react";
 import { Link } from "react-router-dom";
+import { UserProps } from "../../types";
 
-interface UserProps {
-  user: {
-    avatar_url: string;
-    login: string;
-    id: number;
-  };
-}
-
-export const User: React.FC<UserProps> = ({ user }) => {
+export const User: FC<UserProps> = ({ user }) => {
   const { avatar_url, login, id } = user;
   return (
     <div className="user">

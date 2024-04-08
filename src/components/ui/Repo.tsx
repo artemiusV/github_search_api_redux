@@ -1,22 +1,7 @@
-import React from "react";
+import React, { FC } from "react";
+import { RepoProps } from "../../types";
 
-// interface RepoProps {
-//   repo: {
-//     name: string;
-//     description: string;
-//     language: string | null;
-//   };
-// }
-
-type RepoProps = {
-  repo: {
-    name: string;
-    description: string;
-    language: string | null;
-  };
-};
-
-export const Repo: React.FC<RepoProps> = ({ repo }) => {
+export const Repo: FC<RepoProps> = ({ repo }) => {
   const { name, description, language } = repo;
   return (
     <div className="repo">

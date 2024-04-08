@@ -3,12 +3,8 @@ import { AppDispatch } from './../store';
 import { createSlice, createAsyncThunk} from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
-import { UserInfo,RepoInfo } from '../../components/pages/User/UserProfile'
+import { RepoInfo,UserState } from '../../types'
 
-interface UserState {
-  user: UserInfo | null;
-  userRepos: RepoInfo[];
-}
 
 const initialState: UserState = {
   user: null,
@@ -26,9 +22,7 @@ const userSlice = createSlice({
       state.userRepos=action.payload.userRepos
     },
   }, 
-   
 })
-
 
 export const fetchUserInformation = createAsyncThunk<
   void,
@@ -38,10 +32,19 @@ export const fetchUserInformation = createAsyncThunk<
     state: RootState
     }
 >('user/fetchUserInformation', async (login, thunkApi) => {
+try {
   const respon1 = await fetchUserData(login);
   const respons2 = await fetchUserRepos(login);
-  thunkApi.dispatch(setUser({user: respon1.data}))
-  thunkApi.dispatch(setRepos({userRepos: respons2.data}))
+
+  if (respon1 && respons2) { 
+    thunkApi.dispatch(setUser({user: respon1.data}))
+    thunkApi.dispatch(setRepos({userRepos: respons2.data}))
+  }  else {
+    console.error('Error fetching user information');
+  }
+} catch (error) {
+  console.error("Error fetching user information:", error)
+}
 })
 
 export const { setRepos, setUser } = userSlice.actions;

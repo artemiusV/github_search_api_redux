@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { FC, useEffect } from "react";
 import "./User.css";
 import { Repo } from "../../ui/Repo";
 import site from "../../../assets/site.png";
@@ -6,31 +6,12 @@ import github from "../../../assets/github.png";
 import location from "../../../assets/location.png";
 import user from "../../../assets/user.png";
 import { Link, useParams } from "react-router-dom";
-import { fetchUserData, fetchUserRepos } from "../../../api";
+// import { fetchUserData, fetchUserRepos } from "../../../api";
 import { useAppDispatch, useAppSelector } from "../../../hooks/reduxHooks";
 import { fetchUserInformation } from "../../../store/userSlice/userSlice";
 import { selectRepos, selectUser } from "../../../store/userSlice/userSelector";
-// import {axios} from '../../../api'
 
-export interface UserInfo {
-  avatar_url: string;
-  name: string;
-  bio: string;
-  followers: number;
-  following: number;
-  location: string | null;
-  blog: string | null;
-  html_url: string;
-}
-
-export interface RepoInfo {
-  id: number;
-  name: string;
-  description: string;
-  language: string;
-}
-
-export const User: React.FC = () => {
+export const User: FC = () => {
   const { login } = useParams<{ login: string }>();
 
   const dispatch = useAppDispatch();
@@ -42,7 +23,7 @@ export const User: React.FC = () => {
       return;
     }
     dispatch(fetchUserInformation(login));
-  }, []);
+  }, [login]);
 
   return (
     <div className="container">
@@ -83,9 +64,7 @@ export const User: React.FC = () => {
       </div>
       <div className="user-repos">
         {repos?.length ? (
-          repos.map((repo) => {
-            return <Repo repo={repo} key={repo.id} />;
-          })
+          repos.map((repo) => <Repo repo={repo} key={repo.id} />)
         ) : (
           <h2>No repos for this user...</h2>
         )}

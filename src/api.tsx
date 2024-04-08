@@ -24,11 +24,21 @@ export const fetchUsers = async (
 };
 
 export const fetchUserData = async (login: string) => {
-  const response = await instanceAxios.get(`/users/${login}`);
-  return response;
+  try {
+    const response = await instanceAxios.get(`/users/${login}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    return null;
+  }
 };
 
 export const fetchUserRepos = async (login: string) => {
-  const response = await instanceAxios.get(`/users/${login}/repos`);
-  return response;
+  try {
+    const response = await instanceAxios.get(`/users/${login}/repos`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user repos:", error);
+    return null;
+  }
 };
