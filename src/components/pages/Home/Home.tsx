@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC } from "react";
+import React, { useState, FC } from "react";
 import { SubmitHandler, useForm, FieldValues } from "react-hook-form";
 import "./Home.css";
 import { User } from "../../ui/User";
