@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-//кастомный хук
+//кастомный хук можно его переиспользовать в любов участке кода
 const useDebounceEffect = (callback, delay, deps) => {
   useEffect(() => {
     const handler = setTimeout(() => {

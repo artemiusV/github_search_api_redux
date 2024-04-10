@@ -1,6 +1,7 @@
 import React, { useState, FC } from "react";
 import { SubmitHandler, useForm, FieldValues } from "react-hook-form";
 import "./Home.css";
+import { toast, ToastContainer } from "react-toastify";
 import { User } from "../../ui/User";
 import { fetchUsers } from "../../../api";
 import { UsersProps } from "../../../types";
@@ -14,6 +15,21 @@ export const Home: FC<HomeProps> = () => {
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
   const [searchQuery, setSearchQuery] = useState<string>("");
+
+  // const TestNotification = () => {
+  //   const notify = () => {
+  //     toast.success("Тестовое уведомление", {
+  //       position: (toast as any).POSITION.TOP_RIGHT,
+  //       autoClose: 5000,
+  //     });
+  //   };
+
+  //   return (
+  //     <div>
+  //       <button onClick={notify}>Показать уведомление</button>
+  //     </div>
+  //   );
+  // };
 
   const handlePrevPage = () => {
     setPage((page: number) => (page === 1 ? page : page - 1));
@@ -33,9 +49,16 @@ export const Home: FC<HomeProps> = () => {
 
   useDebouncedEffect(
     async () => {
-      if (searchQuery) {
-        const items = await fetchUsers(searchQuery, page, limit);
-        setUsers(items);
+      try {
+        if (searchQuery) {
+          const items = await fetchUsers(searchQuery, page, limit);
+          setUsers(items);
+        }
+      } catch (error) {
+        toast.error("Ошибка при загрузке пользователей", {
+          position: (toast as any).POSITION.TOP_RIGHT,
+          autoClose: 5000,
+        });
       }
     },
     500,
@@ -79,6 +102,8 @@ export const Home: FC<HomeProps> = () => {
           <h2>There is nothing to display...</h2>
         )}
       </div>
+      <ToastContainer />
+      {/* <TestNotification /> */}
     </div>
   );
 };

@@ -6,7 +6,7 @@ import github from "../../../assets/github.png";
 import location from "../../../assets/location.png";
 import user from "../../../assets/user.png";
 import { Link, useParams } from "react-router-dom";
-// import { fetchUserData, fetchUserRepos } from "../../../api";
+import { fetchUserData, fetchUserRepos } from "../../../api";
 import { useAppDispatch, useAppSelector } from "../../../hooks/reduxHooks";
 import { fetchUserInformation } from "../../../store/userSlice/userSlice";
 import { selectRepos, selectUser } from "../../../store/userSlice/userSelector";
@@ -25,6 +25,7 @@ export const User: FC = () => {
     dispatch(fetchUserInformation(login));
   }, [login]);
 
+  // console.log(userInfo, repos);
   return (
     <div className="container">
       <Link to="/" className="back">

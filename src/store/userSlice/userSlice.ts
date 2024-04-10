@@ -21,7 +21,7 @@ const userSlice = createSlice({
     setRepos: (state,action:PayloadAction<{userRepos: RepoInfo[]}>)=>{
       state.userRepos=action.payload.userRepos
     },
-  }, 
+  },
 })
 
 export const fetchUserInformation = createAsyncThunk<
