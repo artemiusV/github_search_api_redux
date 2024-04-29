@@ -1,35 +1,44 @@
-import React, { useState, FC } from "react";
+import React, { useState, FC, useEffect } from "react";
 import { SubmitHandler, useForm, FieldValues } from "react-hook-form";
 import "./Home.css";
 import { toast, ToastContainer } from "react-toastify";
 import { User } from "../../ui/User";
 import { fetchUsers } from "../../../api";
+import { selectUsersSearch } from "../../../store/userSlice/userSelector";
 import { UsersProps } from "../../../types";
 import useDebouncedEffect from "../../../useDebounce";
+import { useAppDispatch, useAppSelector } from "../../../hooks/reduxHooks";
+import { fetchSearchUsers } from "../../../store/userSlice/searchSlice";
 
 type HomeProps = {};
 
 export const Home: FC<HomeProps> = () => {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, getValues } = useForm();
   const [users, setUsers] = useState<UsersProps[]>([]);
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  // const TestNotification = () => {
-  //   const notify = () => {
-  //     toast.success("Тестовое уведомление", {
-  //       position: (toast as any).POSITION.TOP_RIGHT,
-  //       autoClose: 5000,
-  //     });
-  //   };
+  const dispatch = useAppDispatch();
+  const usersSearch = useAppSelector(selectUsersSearch);
 
-  //   return (
-  //     <div>
-  //       <button onClick={notify}>Показать уведомление</button>
-  //     </div>
-  //   );
-  // };
+  console.log(usersSearch);
+  const TestNotification = () => {
+    const notify = () => {
+      toast.success("Тестовое уведомление", {
+        // position: (toast as any).POSITION.TOP_RIGHT,
+        position: "top-right",
+        autoClose: 5000,
+      });
+    };
+
+    return (
+      <div>
+        <button onClick={notify}>Показать уведомление</button>
+        <ToastContainer />
+      </div>
+    );
+  };
 
   const handlePrevPage = () => {
     setPage((page: number) => (page === 1 ? page : page - 1));
@@ -48,22 +57,16 @@ export const Home: FC<HomeProps> = () => {
   };
 
   useDebouncedEffect(
-    async () => {
-      try {
-        if (searchQuery) {
-          const items = await fetchUsers(searchQuery, page, limit);
-          setUsers(items);
-        }
-      } catch (error) {
-        toast.error("Ошибка при загрузке пользователей", {
-          position: (toast as any).POSITION.TOP_RIGHT,
-          autoClose: 5000,
-        });
-      }
+    () => {
+      dispatch(
+        fetchSearchUsers({ searchQuery: getValues().query, page, limit })
+      );
     },
     500,
-    [searchQuery, page, limit]
+    [getValues().query, page, limit]
   );
+
+  console.log(getValues());
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setSearchQuery(data.query);
@@ -103,7 +106,7 @@ export const Home: FC<HomeProps> = () => {
         )}
       </div>
       <ToastContainer />
-      {/* <TestNotification /> */}
+      <TestNotification />
     </div>
   );
 };

@@ -9,7 +9,12 @@ import { Link, useParams } from "react-router-dom";
 import { fetchUserData, fetchUserRepos } from "../../../api";
 import { useAppDispatch, useAppSelector } from "../../../hooks/reduxHooks";
 import { fetchUserInformation } from "../../../store/userSlice/userSlice";
-import { selectRepos, selectUser } from "../../../store/userSlice/userSelector";
+import {
+  selectRepos,
+  selectUser,
+  selectLoading,
+} from "../../../store/userSlice/userSelector";
+import { toast } from "react-toastify";
 
 export const User: FC = () => {
   const { login } = useParams<{ login: string }>();
@@ -17,6 +22,7 @@ export const User: FC = () => {
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector(selectUser);
   const repos = useAppSelector(selectRepos);
+  const loading = useAppSelector(selectLoading);
 
   useEffect(() => {
     if (!login) {
@@ -25,7 +31,10 @@ export const User: FC = () => {
     dispatch(fetchUserInformation(login));
   }, [login]);
 
-  // console.log(userInfo, repos);
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <div className="container">
       <Link to="/" className="back">
