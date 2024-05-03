@@ -44,3 +44,8 @@ export type UserState = {
   loading: boolean;
   error: string | null;
 };
+
+export interface AuthenticationRequest {
+  username: string;
+  password: string;
+}

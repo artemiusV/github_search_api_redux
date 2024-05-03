@@ -1,9 +1,15 @@
+import { UserInfo, RepoInfo } from "./../../types";
 import { fetchUserData, fetchUserRepos } from "./../../api";
 import { AppDispatch } from "./../store";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
-import { RepoInfo, UserState } from "../../types";
+import { UserState } from "../../types";
+
+interface AuthenticationRequest {
+  username: string;
+  password: string;
+}
 
 const initialState: UserState = {
   user: null,
@@ -33,8 +39,9 @@ const userSlice = createSlice({
         };
       })
       .addCase(fetchUserInformation.fulfilled, (state, action) => {
-        state.user = action.payload.response1;
-        state.userRepos = action.payload.response2;
+        state.user = action.payload.UserInfo;
+        state.userRepos = action.payload.RepoInfo;
+        state.loading = false;
       })
       .addCase(fetchUserInformation.rejected, (state, action) => {
         console.error("Error fetching user information:", action.error.message);
@@ -43,29 +50,19 @@ const userSlice = createSlice({
   },
 });
 
-export const fetchUserInformation = createAsyncThunk<
-  { response1: any; response2: any },
-  string,
-  {
-    rejectValue: string;
-    dispatch: AppDispatch;
-    state: RootState;
-  }
->("user/fetchUserInformation", async (login, thunkApi) => {
-  try {
-    const response1 = await fetchUserData(login);
-    const response2 = await fetchUserRepos(login);
+export const fetchUserInformation = createAsyncThunk(
+  "user/fetchUserInformation",
+  async (payload: AuthenticationRequest, { rejectWithValue, dispatch }) => {
+    try {
+      const userDataResponse = await fetchUserData(payload.username);
+      const userReposResponse = await fetchUserRepos(payload.username);
 
-    if (response1 && response2) {
-      thunkApi.dispatch(setUser({ user: response1 }));
-      thunkApi.dispatch(setRepos({ userRepos: response2 }));
-    } else {
-      console.error("Error fetching user information");
+      return { UserInfo: userDataResponse, RepoInfo: userReposResponse };
+    } catch (error) {
+      return rejectWithValue("Error fetching user information");
     }
-  } catch (error) {
-    return thunkApi.rejectWithValue("Error fetching user information");
   }
-});
+);
 
 export const { setRepos, setUser } = userSlice.actions;
 

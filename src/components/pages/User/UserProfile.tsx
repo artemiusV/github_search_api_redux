@@ -16,6 +16,11 @@ import {
 } from "../../../store/userSlice/userSelector";
 import { toast } from "react-toastify";
 
+interface AuthenticationRequest {
+  username: string;
+  password: string;
+}
+
 export const User: FC = () => {
   const { login } = useParams<{ login: string }>();
 
@@ -28,7 +33,11 @@ export const User: FC = () => {
     if (!login) {
       return;
     }
-    dispatch(fetchUserInformation(login));
+    const authenticationData: AuthenticationRequest = {
+      username: login,
+      password: "your_password", // Здесь может быть пароль или другие данные аутентификации
+    };
+    dispatch(fetchUserInformation(authenticationData));
   }, [login]);
 
   if (loading) {

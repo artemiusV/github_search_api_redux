@@ -7,6 +7,7 @@ export const store = configureStore({
     user: userSlice,
     searchUsers: searchSlice,
   },
+  devTools: true,
 });
 
 export type RootState = ReturnType<typeof store.getState>;
