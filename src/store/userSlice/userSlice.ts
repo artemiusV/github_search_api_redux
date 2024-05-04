@@ -1,52 +1,69 @@
-import { fetchUserData, fetchUserRepos } from './../../api';
-import { AppDispatch } from './../store';
-import { createSlice, createAsyncThunk} from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
-import type { RootState } from '../store'
-import { RepoInfo,UserState } from '../../types'
+import { UserInfo, RepoInfo } from "./../../types";
+import { fetchUserData, fetchUserRepos } from "./../../api";
+import { AppDispatch } from "./../store";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
+import type { RootState } from "../store";
+import { UserState } from "../../types";
 
+interface AuthenticationRequest {
+  username: string;
+  password: string;
+}
 
 const initialState: UserState = {
   user: null,
   userRepos: [],
-}
+  loading: false,
+  error: null,
+};
 
-const userSlice = createSlice({ 
-  name: 'user',
+const userSlice = createSlice({
+  name: "user",
   initialState,
   reducers: {
-    setUser: (state, action) => { 
-      state.user = action.payload.user
+    setUser: (state, action) => {
+      state.user = action.payload.user;
     },
-    setRepos: (state,action:PayloadAction<{userRepos: RepoInfo[]}>)=>{
-      state.userRepos=action.payload.userRepos
+    setRepos: (state, action: PayloadAction<{ userRepos: RepoInfo[] }>) => {
+      state.userRepos = action.payload.userRepos;
     },
-  }, 
-})
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUserInformation.pending, (state) => {
+        return {
+          ...state,
+          loading: true,
+          error: null,
+        };
+      })
+      .addCase(fetchUserInformation.fulfilled, (state, action) => {
+        state.user = action.payload.UserInfo;
+        state.userRepos = action.payload.RepoInfo;
+        state.loading = false;
+      })
+      .addCase(fetchUserInformation.rejected, (state, action) => {
+        console.error("Error fetching user information:", action.error.message);
+        state.loading = false;
+      });
+  },
+});
 
-export const fetchUserInformation = createAsyncThunk<
-  void,
-  string,
-  {
-    dispatch: AppDispatch,
-    state: RootState
+export const fetchUserInformation = createAsyncThunk(
+  "user/fetchUserInformation",
+  async (payload: AuthenticationRequest, { rejectWithValue, dispatch }) => {
+    try {
+      const userDataResponse = await fetchUserData(payload.username);
+      const userReposResponse = await fetchUserRepos(payload.username);
+
+      return { UserInfo: userDataResponse, RepoInfo: userReposResponse };
+    } catch (error) {
+      return rejectWithValue("Error fetching user information");
     }
->('user/fetchUserInformation', async (login, thunkApi) => {
-try {
-  const respon1 = await fetchUserData(login);
-  const respons2 = await fetchUserRepos(login);
-
-  if (respon1 && respons2) { 
-    thunkApi.dispatch(setUser({user: respon1.data}))
-    thunkApi.dispatch(setRepos({userRepos: respons2.data}))
-  }  else {
-    console.error('Error fetching user information');
   }
-} catch (error) {
-  console.error("Error fetching user information:", error)
-}
-})
+);
 
 export const { setRepos, setUser } = userSlice.actions;
 
-export default userSlice.reducer
+export default userSlice.reducer;

@@ -6,10 +6,20 @@ import github from "../../../assets/github.png";
 import location from "../../../assets/location.png";
 import user from "../../../assets/user.png";
 import { Link, useParams } from "react-router-dom";
-// import { fetchUserData, fetchUserRepos } from "../../../api";
+import { fetchUserData, fetchUserRepos } from "../../../api";
 import { useAppDispatch, useAppSelector } from "../../../hooks/reduxHooks";
 import { fetchUserInformation } from "../../../store/userSlice/userSlice";
-import { selectRepos, selectUser } from "../../../store/userSlice/userSelector";
+import {
+  selectRepos,
+  selectUser,
+  selectLoading,
+} from "../../../store/userSlice/userSelector";
+import { toast } from "react-toastify";
+
+interface AuthenticationRequest {
+  username: string;
+  password: string;
+}
 
 export const User: FC = () => {
   const { login } = useParams<{ login: string }>();
@@ -17,13 +27,22 @@ export const User: FC = () => {
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector(selectUser);
   const repos = useAppSelector(selectRepos);
+  const loading = useAppSelector(selectLoading);
 
   useEffect(() => {
     if (!login) {
       return;
     }
-    dispatch(fetchUserInformation(login));
+    const authenticationData: AuthenticationRequest = {
+      username: login,
+      password: "your_password", // Здесь может быть пароль или другие данные аутентификации
+    };
+    dispatch(fetchUserInformation(authenticationData));
   }, [login]);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <div className="container">
